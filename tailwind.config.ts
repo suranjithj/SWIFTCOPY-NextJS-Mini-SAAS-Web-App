@@ -1,20 +1,20 @@
 ﻿import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: "class",
   content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/**/*.{js,ts,jsx,tsx}",
+    "./src/pages/**/*.{js,ts,jsx,tsx}",
+    "./src/components/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
-        primary: "#2563eb",   // Blue-600
-        secondary: "#7c3aed", // Purple-600
-        accent: "#f59e0b",    // Amber-500
-        background: "#f9fafb", // Gray-50
-        dark: "#111827",      // Gray-900
+        primary: "#2563eb",
+        secondary: "#7c3aed",
+        accent: "#f59e0b",
+        background: "#f9fafb",
+        dark: "#111827",
       },
       fontFamily: {
         sans: ["Inter", "sans-serif"],
@@ -29,11 +29,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [
-    require("@tailwindcss/forms"),
-    require("@tailwindcss/typography"),
-    require("@tailwindcss/aspect-ratio"),
-  ],
+  plugins: [],
 };
 
 export default config;

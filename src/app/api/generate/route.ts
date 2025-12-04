@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
 
     // Check user quota
     const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+      where: { id: (session.user as any).id },
       include: { subscription: true }
     });
 
@@ -92,7 +92,7 @@ Please format your response as JSON with these exact keys:
     // Save generation to database
     const upload = await prisma.upload.create({
       data: {
-        userId: session.user.id,
+        userId: (session.user as any).id,
         title: `Generated Content - ${new Date().toLocaleDateString()}`,
         type: type === "file" ? "file" : "text",
         content: content.substring(0, 1000), // Store first 1000 chars
@@ -105,7 +105,7 @@ Please format your response as JSON with these exact keys:
     for (const genType of generationTypes) {
       await prisma.generation.create({
         data: {
-          userId: session.user.id,
+          userId: (session.user as any).id,
           uploadId: upload.id,
           type: genType,
           content: generatedContent[genType] || "No content generated",
@@ -116,7 +116,7 @@ Please format your response as JSON with these exact keys:
 
     // Update user quota
     await prisma.user.update({
-      where: { id: session.user.id },
+      where: { id: (session.user as any).id },
       data: { quotaUsed: user.quotaUsed + 1 }
     });
 

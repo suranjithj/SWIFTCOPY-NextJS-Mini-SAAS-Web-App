@@ -1,11 +1,10 @@
 import NextAuth from "next-auth";
-import { PrismaAdapter } from "@auth/prisma-adapter";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/lib/prisma";
 
 const handler = NextAuth({
-  adapter: PrismaAdapter(prisma),
+  secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-development",
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -62,8 +61,12 @@ const handler = NextAuth({
   },
   pages: {
     signIn: "/login",
-    signUp: "/signup",
   },
 });
 
 export { handler as GET, handler as POST };
+
+// Add error handling
+export async function OPTIONS() {
+  return new Response(null, { status: 200 });
+}

@@ -1,5 +1,8 @@
-﻿@import "tailwindcss";
+﻿@tailwind base;
+@tailwind components;
+@tailwind utilities; 
 
+/* Theme variables */
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -15,6 +18,7 @@
   --foreground: #ededed;
 }
 
+/* Smooth transitions */
 html {
   transition: background-color 0.3s ease, color 0.3s ease;
 }

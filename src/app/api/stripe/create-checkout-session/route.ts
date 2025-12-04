@@ -1,21 +1,6 @@
 import { NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
-import Stripe from "stripe";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2023-10-16",
-});
-
-const plans = {
-  pro: {
-    priceId: "price_pro_monthly", // Replace with actual Stripe price ID
-    quota: -1, // Unlimited
-  },
-  enterprise: {
-    priceId: "price_enterprise_monthly", // Replace with actual Stripe price ID
-    quota: -1, // Unlimited
-  },
-};
+import { stripe } from "@/lib/stripeClient";
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,29 +10,26 @@ export async function POST(req: NextRequest) {
     }
 
     const { planId } = await req.json();
-    
-    if (!planId || !plans[planId as keyof typeof plans]) {
-      return new Response(JSON.stringify({ error: "Invalid plan" }), { status: 400 });
-    }
 
-    const plan = plans[planId as keyof typeof plans];
+    if (!planId) {
+      return new Response(JSON.stringify({ error: "Plan ID is required" }), { status: 400 });
+    }
 
     // Create Stripe checkout session
     const checkoutSession = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
         {
-          price: plan.priceId,
+          price: planId,
           quantity: 1,
         },
       ],
       mode: "subscription",
-      success_url: `${process.env.NEXTAUTH_URL}/pages/billing?success=true`,
+      success_url: `${process.env.NEXTAUTH_URL}/dashboard?success=true`,
       cancel_url: `${process.env.NEXTAUTH_URL}/pages/billing?canceled=true`,
-      customer_email: session.user.email,
+      customer_email: session.user.email || undefined,
       metadata: {
-        userId: session.user.id,
-        planId: planId,
+        userId: (session.user as any).id,
       },
     });
 
@@ -56,7 +38,7 @@ export async function POST(req: NextRequest) {
       headers: { "Content-Type": "application/json" },
     });
   } catch (error: any) {
-    console.error("Stripe checkout error:", error);
-    return new Response(JSON.stringify({ error: "Failed to create checkout session" }), { status: 500 });
+    console.error("Stripe error:", error);
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 }
